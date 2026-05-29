@@ -606,7 +606,7 @@ canvas#cert-canvas{display:block;width:100%;height:auto;border:1px solid rgba(20
       <option value="тревоги">Тревоги</option>
       <option value="долга">Долга</option>
       <option value="страха">Страха</option>
-      <option value="своего">Своего источника</option>
+      <option value="своего источника">Своего источника</option>
     </select>
     <input class="tsl-input" type="text" id="s4-before-custom" placeholder="или своё…" style="margin-top:6px">
   </div>
@@ -618,7 +618,7 @@ canvas#cert-canvas{display:block;width:100%;height:auto;border:1px solid rgba(20
       <option value="потока">Потока</option>
       <option value="ресурса">Ресурса</option>
       <option value="смысла">Смысла</option>
-      <option value="своего">Своего источника</option>
+      <option value="своего источника">Своего источника</option>
     </select>
     <input class="tsl-input" type="text" id="s4-after-custom" placeholder="или своё…" style="margin-top:6px">
   </div>
@@ -718,7 +718,7 @@ canvas#cert-canvas{display:block;width:100%;height:auto;border:1px solid rgba(20
       <button class="cta cta-primary" onclick="downloadCert()">⬇ Скачать сертификат</button>
     </div>
     <div class="cert-upsell">
-      За этим результатом стоит более глубокий уровень. Родовые чертежи (УПР) и уникальный образец человека (УПЧ) — в курсе «Архитектор Наследия».<br><br>
+      За этим результатом стоит более глубокий уровень. Родовые чертежи (УПР) и уникальный паттерн человека (УПЧ) — в курсе «Архитектор Наследия».<br><br>
       <a href="https://architecture-legacy.ru/nasledie" target="_blank">Подробнее о программе →</a>
     </div>
   </div>
@@ -740,6 +740,28 @@ function detectGender(name){
 function verb(base, gender){
   const forms = {'прошёл':'прошла','освоил':'освоила'};
   return gender==='f' && forms[base] ? forms[base] : base;
+}
+
+// Convert stored values to correct preposition phrases
+function stateFrom(val){
+  // val already in родительный падеж (усилия, тревоги, долга, страха, своего источника)
+  // or free text entered by user
+  if(!val) return 'усилия';
+  return val;
+}
+function stateTo(val){
+  // convert to дательный падеж
+  const map = {
+    'потока':'потоку',
+    'ресурса':'ресурсу',
+    'смысла':'смыслу',
+    'своего источника':'своему источнику',
+    'поток':'потоку',
+    'ресурс':'ресурсу',
+    'смысл':'смыслу',
+  };
+  if(!val) return 'потоку';
+  return map[val.toLowerCase()] || val;
 }
 const STEPS = ['Вход','Компас','Открытие','Резонанс','Итог','Сертификат'];
 const TOTAL = 6;
@@ -916,8 +938,8 @@ function showQuote(){
 function buildResultCards(){
   // update transition visual
   const prof2=ST.profile||computeProfile(ST.n,ST.c,ST.p);
-  document.getElementById('tv-before-val').textContent=ST.before||'усилия';
-  document.getElementById('tv-after-val').textContent=ST.after||'поток';
+  document.getElementById('tv-before-val').textContent='от '+stateFrom(ST.before||'усилия');
+  document.getElementById('tv-after-val').textContent='к '+stateTo(ST.after||'потока');
   document.getElementById('tv-fill-n').style.width=(ST.n/10*100)+'%';
   document.getElementById('tv-fill-c').style.width=(ST.c/10*100)+'%';
   document.getElementById('tv-fill-p').style.width=(ST.p/10*100)+'%';
@@ -952,7 +974,7 @@ function buildResultCards(){
     <div class="res-card">
       <div class="res-card-icon">⟳</div>
       <div class="res-card-label">Состояние: переход</div>
-      <div class="res-card-value"><em>${bef}</em><br>↓<br><em>${aft}</em></div>
+      <div class="res-card-value"><em>от ${stateFrom(bef)}</em><br>↓<br><em>к ${stateTo(aft)}</em></div>
     </div>
   `;
   // Build quote card after a short delay for animation
@@ -1227,7 +1249,7 @@ function buildCert(){
     ctx.fillText('СОСТОЯНИЕ: ПЕРЕХОД',W/2,939);
     ctx.fillStyle='rgba(245,242,237,0.75)';
     ctx.font='italic 300 34px Cormorant Garamond,serif';
-    ctx.fillText(bef+'  →  '+aft,W/2,978);
+    ctx.fillText('от '+stateFrom(bef)+' → к '+stateTo(aft),W/2,978);
 
     // date
     const d=new Date();
