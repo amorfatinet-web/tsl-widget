@@ -159,6 +159,9 @@ input.P::-moz-range-thumb{background:var(--p);width:32px;height:32px;border-radi
 .res-dom-badge.C{background:rgba(201,169,110,.12);border:1px solid rgba(201,169,110,.4);color:var(--c)}
 .res-dom-badge.P{background:rgba(224,212,192,.08);border:1px solid rgba(224,212,192,.3);color:var(--p)}
 .res-dom-badge.BAL{background:rgba(100,160,255,.08);border:1px solid rgba(100,160,255,.25);color:rgba(150,200,255,.85)}
+.res-dom-badge.NC{background:rgba(77,201,168,.12);border:1px solid rgba(201,169,110,.4);color:var(--gold)}
+.res-dom-badge.NP{background:rgba(77,201,168,.10);border:1px solid rgba(224,212,192,.35);color:var(--n)}
+.res-dom-badge.CP{background:rgba(201,169,110,.10);border:1px solid rgba(224,212,192,.35);color:var(--gold)}
 .res-title{font-family:'Cormorant Garamond',serif;
   font-size:clamp(26px,6vw,38px);font-weight:300;text-align:center;
   line-height:1.2;margin-bottom:6px;color:var(--gold2)}
@@ -167,6 +170,9 @@ input.P::-moz-range-thumb{background:var(--p);width:32px;height:32px;border-radi
 .res-title.C em{color:var(--gold3)}
 .res-title.P em{color:var(--p2)}
 .res-title.BAL em{color:rgba(150,200,255,.9)}
+.res-title.NC em{color:var(--gold3)}
+.res-title.NP em{color:var(--n)}
+.res-title.CP em{color:var(--gold3)}
 .res-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,3vw,16px);
   font-style:italic;color:var(--dim2);text-align:center;margin-bottom:20px}
 
@@ -521,6 +527,12 @@ const DIAG = {
     text:'Ваше внимание поглощено фактами, задачами и физическим состоянием. Устойчивое решение родится, когда вы поднимитесь к смыслам.',
     actTitle:'Добавить уровень P',
     actDesc:'Задайте себе вопрос: «Зачем я это делаю? Какой замысел за этой ситуацией?» Три минуты тишины с этим вопросом — и система получит новые координаты.',
+    soft:{
+      badge:'N · Внимание склонилось к фактам',
+      text:'Система чуть склонилась в сторону фактов и действий. Небольшая коррекция к смыслу вернёт равновесие и сделает шаги осознаннее.',
+      actTitle:'Лёгкая коррекция к P',
+      actDesc:'Один короткий вопрос: «Ради чего этот шаг?» Достаточно минуты — и фокус мягко выравнивается.'
+    },
     dirs:[
       {cl:'P',ic:'✦',text:'<strong>Найдите замысел.</strong> Не «что делать», а «ради чего». Один честный ответ меняет качество всего действия.'},
       {cl:'C',ic:'◎',text:'<strong>Прочитайте паттерн.</strong> Это уже случалось? Что повторяется — паттерн, а не случайность.'},
@@ -535,6 +547,12 @@ const DIAG = {
     text:'Много рефлексии, мало действий. Вы видите паттерны и понимаете картину — но строительство не начинается без первого кирпича.',
     actTitle:'Добавить уровень N',
     actDesc:'Совершите одно материальное действие сегодня — физическое, маленькое, конкретное. Рефлексия без движения — это архитектурный проект без стройки.',
+    soft:{
+      badge:'C · Внимание склонилось к паттернам',
+      text:'Система чуть склонилась в сторону наблюдения и анализа. Одно небольшое действие вернёт движению опору.',
+      actTitle:'Лёгкая коррекция к N',
+      actDesc:'Сделайте один маленький конкретный шаг в ближайшие минуты — этого достаточно, чтобы рефлексия перешла в движение.'
+    },
     dirs:[
       {cl:'N',ic:'⊙',text:'<strong>Один шаг прямо сейчас.</strong> Не план, не анализ — физическое действие в течение ближайших 15 минут.'},
       {cl:'P',ic:'✦',text:'<strong>Уточните замысел.</strong> За всей рефлексией — что по-настоящему важно? Одно предложение.'},
@@ -549,10 +567,58 @@ const DIAG = {
     text:'Много вдохновения — нет структуры. Вы чувствуете замысел, стоите на пороге сдвига. Нужен первый кирпич.',
     actTitle:'Перевести замысел в план',
     actDesc:'Превратите вдохновение в чертёж (C), а чертёж — в первый шаг (N). Великое начинается с одного конкретного действия сегодня.',
+    soft:{
+      badge:'P · Внимание склонилось к замыслу',
+      text:'Система чуть склонилась в сторону смысла и вдохновения. Небольшая структура и первый шаг переведут замысел в движение.',
+      actTitle:'Лёгкая коррекция к C и N',
+      actDesc:'Запишите один следующий шаг — и сделайте его. Этого достаточно, чтобы вдохновение обрело форму.'
+    },
     dirs:[
       {cl:'N',ic:'⊙',text:'<strong>Первый кирпич.</strong> Самое маленькое конкретное действие — лучший для начала. Что можно сделать прямо сейчас?'},
       {cl:'C',ic:'◎',text:'<strong>Создайте чертёж.</strong> Переведите вдохновение в последовательность шагов. Замысел без структуры — это ещё не проект.'},
       {cl:'P',ic:'✦',text:'<strong>Назовите замысел вслух.</strong> Произнесите одним предложением. Это запускает механизм воплощённого познания.'},
+    ]
+  },
+  NC:{
+    badge:'NC · Действие и анализ',badgeClass:'NC',
+    titlePre:'Сила в',titleEm:'движении',titleClass:'NC',
+    sub:'N + C · Действие и паттерны',
+    glowClass:'gn',
+    text:'Система работает на полную мощность — в фактах и паттернах. Вопрос «зачем» откроет уровень замысла, даст системе новые координаты и освободит энергию.',
+    actTitle:'Добавить уровень P',
+    actDesc:'Задайте системе вопрос о замысле: «Ради чего большего всё это движение?» Три минуты тишины с этим вопросом переведут мощность в направление.',
+    dirs:[
+      {cl:'P',ic:'✦',text:'<strong>Назовите замысел.</strong> Один честный ответ на «ради чего» превращает активность в осмысленное движение.'},
+      {cl:'C',ic:'◎',text:'<strong>Удержите ясность паттернов.</strong> Понимание уже есть — закрепите его как опору для следующего шага.'},
+      {cl:'N',ic:'⊙',text:'<strong>Продолжайте действовать.</strong> Энергия действия — ваш ресурс. Направьте её туда, где есть смысл.'},
+    ]
+  },
+  NP:{
+    badge:'NP · Интуитивное действие',badgeClass:'NP',
+    titlePre:'Сила в',titleEm:'замысле',titleClass:'NP',
+    sub:'N + P · Действие и смысл',
+    glowClass:'gn',
+    text:'Вы действуете из глубокого замысла — и это сила. Осознание паттернов (C) сделает движение точнее, устойчивее и воспроизводимее.',
+    actTitle:'Добавить уровень C',
+    actDesc:'Назовите повторяющийся паттерн в своих действиях. Паттерн с именем становится материалом для работы и делает интуицию управляемой.',
+    dirs:[
+      {cl:'C',ic:'◎',text:'<strong>Назовите паттерн точно.</strong> Дайте ему имя — это переводит интуицию в осознанный инструмент.'},
+      {cl:'P',ic:'✦',text:'<strong>Удержите замысел.</strong> Глубокий смысл уже ведёт вас. Закрепите его одним предложением.'},
+      {cl:'N',ic:'⊙',text:'<strong>Сохраните темп действий.</strong> Движение из смысла — ваша опора. Поддержите ритм.'},
+    ]
+  },
+  CP:{
+    badge:'CP · Замысел ждёт шага',badgeClass:'CP',
+    titlePre:'Сила в',titleEm:'ясности',titleClass:'CP',
+    sub:'C + P · Понимание и смысл',
+    glowClass:'gc',
+    text:'Ясность замысла и глубина понимания — у вас есть оба. Первое конкретное физическое действие (N) переведёт систему в движение.',
+    actTitle:'Добавить уровень N',
+    actDesc:'Совершите одно материальное действие сегодня — маленькое, конкретное, физическое. Один кирпич прямо сейчас запускает воплощение замысла.',
+    dirs:[
+      {cl:'N',ic:'⊙',text:'<strong>Один кирпич прямо сейчас.</strong> Самое маленькое физическое действие в ближайшие 15 минут запускает всю систему.'},
+      {cl:'C',ic:'◎',text:'<strong>Удержите ясность паттернов.</strong> Понимание уже есть — используйте его как чертёж для первого шага.'},
+      {cl:'P',ic:'✦',text:'<strong>Сохраните замысел.</strong> Смысл ведёт вас. Переведите его в последовательность конкретных шагов.'},
     ]
   },
   BAL:{
@@ -571,6 +637,36 @@ const DIAG = {
   }
 };
 
+/* DETERMINE DOMINANT — единый алгоритм для всех точек */
+function getDominant(n,c,p){
+  const diff = Math.max(Math.abs(n-c),Math.abs(c-p),Math.abs(n-p));
+  // 1. Смешанные статусы — самые специфичные, проверяются первыми
+  if(n>=7 && c>=7 && p<=4) return 'NC';
+  if(n>=7 && p>=7 && c<=4) return 'NP';
+  if(c>=7 && p>=7 && n<=4) return 'CP';
+  // 2. Баланс
+  if(diff<=1) return 'BAL';
+  // 3. Одиночные доминанты
+  if(n>=c && n>=p) return 'N';
+  if(c>=n && c>=p) return 'C';
+  return 'P';
+}
+
+/* INTENSITY — для одиночных доминант N/C/P выбираем лёгкий/выраженный текст.
+   diff 2–4 → лёгкий (мягкая коррекция), diff 5+ → выраженный (текущие тексты).
+   Базовый код (dom) не меняется — цвета, стрелки, сохранение в М4 работают как есть. */
+function resolveDiag(dom,n,c,p){
+  const base = DIAG[dom];
+  if((dom==='N'||dom==='C'||dom==='P') && base.soft){
+    const diff = Math.max(Math.abs(n-c),Math.abs(c-p),Math.abs(n-p));
+    if(diff<=4){
+      // лёгкая интенсивность — накладываем мягкие тексты поверх базовой записи
+      return Object.assign({}, base, base.soft);
+    }
+  }
+  return base;
+}
+
 /* SHOW RESULT */
 window.showResult = function(){
   const n=DATA.N, c=DATA.C, p=DATA.P;
@@ -580,14 +676,9 @@ window.showResult = function(){
   const pP=Math.round(p/total*100);
 
   // Determine dominant
-  const diff = Math.max(Math.abs(n-c),Math.abs(c-p),Math.abs(n-p));
-  let dom;
-  if(diff<=2) dom='BAL';
-  else if(n>=c&&n>=p) dom='N';
-  else if(c>=n&&c>=p) dom='C';
-  else dom='P';
+  const dom = getDominant(n,c,p);
 
-  const d = DIAG[dom];
+  const d = resolveDiag(dom,n,c,p);
 
   // Set glow
   document.getElementById('glowBg').className='glow-bg '+d.glowClass;
@@ -677,9 +768,9 @@ function drawCompassSVG(dom,n,c,p){
     if(isDom){const tail=R*.25;let tx2=CX,ty2=CY;if(dir==='up')ty2=CY+tail;else if(dir==='down')ty2=CY-tail;else if(dir==='right')tx2=CX-tail;const tl=sv('line',{x1:CX,y1:CY,x2:tx2,y2:ty2,stroke:col,'stroke-width':sw*.55,'stroke-linecap':'round',opacity:.22});S.appendChild(tl);}
   }
   const total=n+c+p||1;
-  arrow(Math.round(p/total*100),'#E0D4C0','up',dom==='P'||dom==='BAL');
-  arrow(Math.round(n/total*100),'#4DC9A8','down',dom==='N'||dom==='BAL');
-  arrow(Math.round(c/total*100),'#C9A96E','right',dom==='C'||dom==='BAL');
+  arrow(Math.round(p/total*100),'#E0D4C0','up',dom==='P'||dom==='BAL'||dom==='NP'||dom==='CP');
+  arrow(Math.round(n/total*100),'#4DC9A8','down',dom==='N'||dom==='BAL'||dom==='NC'||dom==='NP');
+  arrow(Math.round(c/total*100),'#C9A96E','right',dom==='C'||dom==='BAL'||dom==='NC'||dom==='CP');
   // Center
   S.appendChild(sv('circle',{cx:CX,cy:CY,r:6,fill:'rgba(201,169,110,.65)'}));
   S.appendChild(sv('circle',{cx:CX,cy:CY,r:3,fill:'#C9A96E'}));
@@ -697,9 +788,8 @@ window.openDiary = function(){
   const n=DATA.N,c=DATA.C,p=DATA.P;
   const total=n+c+p||1;
   const pN=Math.round(n/total*100),pC=Math.round(c/total*100),pP=Math.round(p/total*100);
-  const diff=Math.max(Math.abs(n-c),Math.abs(c-p),Math.abs(n-p));
-  const dom=diff<=2?'BAL':n>=c&&n>=p?'N':c>=n&&c>=p?'C':'P';
-  const d=DIAG[dom];
+  const dom=getDominant(n,c,p);
+  const d=resolveDiag(dom,n,c,p);
   const ms=DATA.micro||document.getElementById('microInput')?.value?.trim()||'';
   const entry={
     date: new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'}),
@@ -719,6 +809,23 @@ window.openDiary = function(){
   diary.unshift(entry);
   if(diary.length>50)diary=diary.slice(0,50);
   try{localStorage.setItem('tsl_diary',JSON.stringify(diary));}catch(e){}
+
+  // Сохраняем стартовую точку курса для сравнения в М4
+  // Только если ключа ещё нет — фиксируем ПЕРВЫЙ результат
+  try{
+    const m1key = 'tsl_kompas_m1';
+    const existing = localStorage.getItem(m1key);
+    const m1data = {
+      N: n, C: c, P: p,
+      dominant: dom,
+      diagnosis: d.badge,
+      situation: DATA.sit || '',
+      date: new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'}),
+      timestamp: Date.now()
+    };
+    // Всегда обновляем — последний результат М1 идёт в сравнение
+    localStorage.setItem(m1key, JSON.stringify(m1data));
+  }catch(e){}
 
   // Показываем Дневник во всплывающем окне
   const W2=Math.min(620,window.innerWidth-32);
@@ -777,20 +884,22 @@ window.downloadStories = function(){
   const n=DATA.N,c=DATA.C,p=DATA.P;
   const total=n+c+p||1;
   const pN=Math.round(n/total*100),pC=Math.round(c/total*100),pP=Math.round(p/total*100);
-  const diff=Math.max(Math.abs(n-c),Math.abs(c-p),Math.abs(n-p));
-  let dom=diff<=2?'BAL':n>=c&&n>=p?'N':c>=n&&c>=p?'C':'P';
-  const d=DIAG[dom];
+  let dom=getDominant(n,c,p);
+  const d=resolveDiag(dom,n,c,p);
 
   // Colors per dom
-  const domCol={N:'#4DC9A8',C:'#C9A96E',P:'#E0D4C0',BAL:'rgba(150,200,255,.9)'};
-  const domGlow={N:'rgba(77,201,168,0.22)',C:'rgba(201,169,110,0.24)',P:'rgba(224,212,192,0.16)',BAL:'rgba(100,160,255,0.14)'};
+  const domCol={N:'#4DC9A8',C:'#C9A96E',P:'#E0D4C0',BAL:'rgba(150,200,255,.9)',NC:'#C9A96E',NP:'#4DC9A8',CP:'#C9A96E'};
+  const domGlow={N:'rgba(77,201,168,0.22)',C:'rgba(201,169,110,0.24)',P:'rgba(224,212,192,0.16)',BAL:'rgba(100,160,255,0.14)',NC:'rgba(201,169,110,0.22)',NP:'rgba(77,201,168,0.22)',CP:'rgba(201,169,110,0.20)'};
   const dc=domCol[dom],dg=domGlow[dom];
   // Рекомендации — короткие мотивационные фразы
   const RECS={
     N:['Задайте себе один вопрос:\n«Ради чего большего\nя делаю этот шаг?»','3 минуты тишины с этим\nвопросом меняют качество\nлюбого действия.'],
     C:['Один физический шаг\nпрямо сейчас — лучше\nлюбого анализа.','Рефлексия без движения —\nэто архитектурный\nпроект без стройки.'],
     P:['Переведите вдохновение\nв первый конкретный шаг.\nВеликое начинается с малого.','Назовите замысел вслух\nодним предложением —\nэто запускает воплощение.'],
-    BAL:['Зафиксируйте это состояние:\nчто вы делаете, что\nприводит к балансу?','Равновесие — не финал,\nа точка откуда виден\nследующий уровень.']
+    BAL:['Зафиксируйте это состояние:\nчто вы делаете, что\nприводит к балансу?','Равновесие — не финал,\nа точка откуда виден\nследующий уровень.'],
+    NC:['Задайте системе вопрос:\n«Ради чего большего\nвсё это движение?»','Три минуты тишины с этим\nвопросом переводят мощность\nв направление.'],
+    NP:['Назовите повторяющийся\nпаттерн своих действий —\nдайте ему точное имя.','Паттерн с именем делает\nинтуицию управляемым\nинструментом.'],
+    CP:['Один физический шаг\nпрямо сейчас переводит\nзамысел в движение.','Первый кирпич сегодня\nзапускает воплощение\nвсего проекта.']
   };
   const rec=RECS[dom];
 
