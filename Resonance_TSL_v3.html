@@ -943,6 +943,32 @@ window.downloadStories=function(){
 window.resetAll=function(){location.reload();};
 
 })();
+
+/* ── Передача высоты родителю (для cross-origin встраивания на Тильде) ── */
+(function(){
+  function sendHeight(){
+    var h = Math.max(
+      document.documentElement.scrollHeight,
+      document.body ? document.body.scrollHeight : 0,
+      document.documentElement.offsetHeight
+    );
+    try{ parent.postMessage({tslResonanceHeight: h}, '*'); }catch(e){}
+  }
+  // По загрузке и с задержками — на случай поздней дорисовки шрифтов/виджета
+  window.addEventListener('load', function(){
+    sendHeight();
+    setTimeout(sendHeight, 400);
+    setTimeout(sendHeight, 1200);
+  });
+  // По запросу от родительской страницы
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.tslRequestHeight) sendHeight();
+  });
+  // При любом изменении размера контента
+  try{ new ResizeObserver(sendHeight).observe(document.body); }catch(e){}
+  // Подстраховка: периодически первые 4 секунды
+  var n=0, t=setInterval(function(){ sendHeight(); if(++n>=8) clearInterval(t); }, 500);
+})();
 </script>
 </body>
 </html>
