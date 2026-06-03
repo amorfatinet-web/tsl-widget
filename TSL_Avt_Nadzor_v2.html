@@ -135,6 +135,17 @@ body::before{
   font-style:italic;font-family:'Cormorant Garamond',serif;line-height:1.5
 }
 .field-group{margin-bottom:20px}
+/* ── Выбор рода для сертификата ── */
+.gender-toggle{display:flex;gap:10px;margin-top:10px}
+.gender-opt{
+  flex:1;text-align:center;cursor:pointer;
+  background:rgba(201,169,110,.05);border:1px solid rgba(201,169,110,.25);
+  padding:11px 8px;font-family:'Raleway',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(245,242,237,.45);transition:all .25s;-webkit-appearance:none;border-radius:0;
+}
+.gender-opt:hover{border-color:rgba(201,169,110,.5);color:rgba(245,242,237,.7)}
+.gender-opt.active{background:rgba(201,169,110,.16);border-color:var(--gold);color:var(--gold)}
 
 /* ── SELECT ── */
 .tsl-select{
@@ -478,7 +489,12 @@ canvas#cert-canvas{display:block;width:100%;height:auto;border:1px solid rgba(20
   </div>
   <div class="field-group">
     <label class="field-label">Твоё имя — именно так оно появится в сертификате</label>
-    <input class="tsl-input" type="text" id="user-name" placeholder="Введи имя…" autocomplete="given-name">
+    <input class="tsl-input" type="text" id="user-name" placeholder="Введи имя…" autocomplete="given-name" oninput="autoGender()">
+    <label class="field-label" style="margin-top:14px">Род для текста сертификата</label>
+    <div class="gender-toggle">
+      <button type="button" class="gender-opt" id="gender-f" onclick="setGender('f')">Прошла</button>
+      <button type="button" class="gender-opt" id="gender-m" onclick="setGender('m')">Прошёл</button>
+    </div>
   </div>
   <button class="cta cta-primary" onclick="goTo(2)">Войти на объект →</button>
 </section>
@@ -793,7 +809,27 @@ canvas#cert-canvas{display:block;width:100%;height:auto;border:1px solid rgba(20
 
 <script>
 // ── STATE ──
-const ST = {name:'',gender:'m',n:5,c:5,p:5,reflection:'',opening:'',before:'',after:'',moment:'',profile:null,step:1};
+const ST = {name:'',gender:'m',genderLocked:false,n:5,c:5,p:5,reflection:'',opening:'',before:'',after:'',moment:'',profile:null,step:1};
+
+// ── GENDER ──
+// Явный выбор пользователя имеет приоритет. Авто-определение по имени —
+// только подсказка, пока человек не выбрал сам (имена на -а/-я бывают и мужскими).
+function setGender(g){
+  ST.gender = g;
+  ST.genderLocked = true;
+  syncGenderUI();
+}
+function autoGender(){
+  if(ST.genderLocked) return;            // пользователь уже выбрал — не трогаем
+  const name = (document.getElementById('user-name')||{}).value || '';
+  ST.gender = detectGender(name);
+  syncGenderUI();
+}
+function syncGenderUI(){
+  const f=document.getElementById('gender-f'), m=document.getElementById('gender-m');
+  if(f) f.classList.toggle('active', ST.gender==='f');
+  if(m) m.classList.toggle('active', ST.gender==='m');
+}
 
 // ── GENDER DETECTION ──
 function detectGender(name){
@@ -803,7 +839,20 @@ function detectGender(name){
   return 'm';
 }
 function verb(base, gender){
-  const forms = {'прошёл':'прошла','освоил':'освоила'};
+  const forms = {
+    'прошёл':'прошла','прошел':'прошла',
+    'освоил':'освоила',
+    'завершил':'завершила',
+    'получил':'получила',
+    'настроил':'настроила',
+    'совершил':'совершила',
+    'подписал':'подписала',
+    'увидел':'увидела','видел':'видела',
+    'стал':'стала',
+    'вошёл':'вошла','вошел':'вошла',
+    'приступил':'приступила',
+    'готов':'готова'
+  };
   return gender==='f' && forms[base] ? forms[base] : base;
 }
 
@@ -995,7 +1044,7 @@ function safeVal(id, fallback){
 
 function collectData(){
   ST.name = safeVal('user-name','').trim();
-  ST.gender = detectGender(ST.name);
+  if(!ST.genderLocked) ST.gender = detectGender(ST.name);  // авто только если не выбрано вручную
   const n = parseInt(safeVal('sl-n','5')); ST.n = isNaN(n) ? 5 : n;
   const c = parseInt(safeVal('sl-c','5')); ST.c = isNaN(c) ? 5 : c;
   const p = parseInt(safeVal('sl-p','5')); ST.p = isNaN(p) ? 5 : p;
