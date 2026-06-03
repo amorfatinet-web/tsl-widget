@@ -720,6 +720,21 @@ window.showResult = function(){
       <span class="dir-icon">${dir.ic}</span>
       <div class="dir-txt">${dir.text}</div>
     </div>`).join('');
+
+  // ── Стартовая точка курса для сравнения в Модуле 4 ──
+  // Сохраняем СРАЗУ при показе результата (не только при открытии Дневника),
+  // чтобы блок «было→стало» в Авторском надзоре всегда получал данные.
+  try{
+    const m1data = {
+      N: n, C: c, P: p,
+      dominant: dom,
+      diagnosis: d.badge,
+      situation: DATA.sit || '',
+      date: new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'}),
+      timestamp: Date.now()
+    };
+    localStorage.setItem('tsl_kompas_m1', JSON.stringify(m1data));
+  }catch(e){}
 };
 
 /* COMPASS SVG */
