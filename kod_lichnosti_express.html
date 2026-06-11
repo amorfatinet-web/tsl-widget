@@ -79,6 +79,8 @@ canvas{display:none}
   h1{margin-bottom:6px}
   .lead{margin-bottom:6px}
 }
+.viral{font-size:12px;color:rgba(245,242,237,.45);line-height:1.7;text-align:center;margin-top:4px;letter-spacing:.4px}
+.viral b{color:rgba(201,169,110,.85);font-weight:600}
 </style>
 </head>
 <body>
@@ -145,7 +147,9 @@ canvas{display:none}
     <div class="share-row">
       <div class="cta-lbl">Что дальше</div>
       <button class="btn" onclick="goDeep()">Получить полный Код с сертификатом →</button>
-      <button class="btn btn-sec" onclick="shareCard()">Сохранить карточку для сторис</button>
+      <button class="btn btn-sec" onclick="shareCard('stories')">Поделиться в сторис · 9:16</button>
+      <button class="btn btn-sec" onclick="shareCard('post')">Карточка для поста · 4:5</button>
+      <div class="viral">Отметьте <b>@TSL_method</b> — лучшие формулы попадают в подборку сообщества</div>
       <a class="btn-ghost" href="https://t.me/TSL_method" target="_top">Войти в сообщество ТСЛ™ →</a>
     </div>
   </div>
@@ -205,75 +209,196 @@ window.goDeep = function(){
   window.top.location.href='https://architecture-legacy.ru/code';
 };
 
-// === Stories-карточка ===
-function fitFont(ctx,text,weightStyle,startPx,minPx,maxW){
-  let px=startPx;
-  while(px>minPx){ ctx.font=weightStyle+' '+px+'px Georgia,serif'; if(ctx.measureText(text).width<=maxW) break; px-=2; }
-  ctx.font=weightStyle+' '+px+'px Georgia,serif'; return px;
+// === Карточки для соцсетей · v2 (сторис 9:16 + пост 4:5, печать, фирменные шрифты, нативный шеринг) ===
+const SERIF = "'Cormorant Garamond',Georgia,serif";
+const SANS  = "'Raleway',Arial,sans-serif";
+
+async function ensureFonts(){
+  try{
+    await Promise.all([
+      document.fonts.load("300 80px 'Cormorant Garamond'"),
+      document.fonts.load("italic 300 80px 'Cormorant Garamond'"),
+      document.fonts.load("italic 400 46px 'Cormorant Garamond'"),
+      document.fonts.load("italic 600 60px 'Cormorant Garamond'"),
+      document.fonts.load("800 30px 'Raleway'"),
+      document.fonts.load("700 22px 'Raleway'"),
+      document.fonts.load("600 24px 'Raleway'")
+    ]);
+  }catch(e){}
 }
-window.shareCard = function(){
-  const cv=document.getElementById('cv'); const ctx=cv.getContext('2d'); const W=1080,H=1920;
-  // фон
-  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0d1829'); g.addColorStop(1,'#16243f');
-  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-  // двойная рамка
-  ctx.strokeStyle='rgba(201,169,110,.55)'; ctx.lineWidth=2; ctx.strokeRect(60,60,W-120,H-120);
-  ctx.strokeStyle='rgba(201,169,110,.28)'; ctx.lineWidth=1; ctx.strokeRect(72,72,W-144,H-144);
-  // угловые золотые засечки
-  ctx.strokeStyle='#C9A96E'; ctx.lineWidth=4; const cl=54;
-  // tl
-  ctx.beginPath(); ctx.moveTo(60,60+cl); ctx.lineTo(60,60); ctx.lineTo(60+cl,60); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(W-60,60+cl); ctx.lineTo(W-60,60); ctx.lineTo(W-60-cl,60); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(60,H-60-cl); ctx.lineTo(60,H-60); ctx.lineTo(60+cl,H-60); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(W-60,H-60-cl); ctx.lineTo(W-60,H-60); ctx.lineTo(W-60-cl,H-60); ctx.stroke();
+function wrapLines(ctx,text,maxW){
+  const words=(text||'').split(/\s+/).filter(Boolean); const lines=[]; let cur='';
+  words.forEach(w=>{ const probe=cur?cur+' '+w:w;
+    if(ctx.measureText(probe).width<=maxW){ cur=probe; } else { if(cur)lines.push(cur); cur=w; } });
+  if(cur)lines.push(cur); return lines;
+}
+function fitWrap(ctx,text,style,px,minPx,maxW,maxLines){
+  let lines;
+  for(;;){ ctx.font=style+' '+px+'px '+SERIF; lines=wrapLines(ctx,text,maxW);
+    if(lines.length<=maxLines||px<=minPx) break; px-=3; }
+  return {px:px,lines:lines};
+}
+function rr(ctx,x,y,w,h,r){ ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function drawSeal(ctx,cx,cy,r){
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(-0.14); ctx.textAlign='center';
+  ctx.strokeStyle='rgba(201,169,110,.9)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(0,0,r,0,7); ctx.stroke();
+  ctx.setLineDash([6,7]); ctx.lineWidth=1.6; ctx.strokeStyle='rgba(201,169,110,.55)';
+  ctx.beginPath(); ctx.arc(0,0,r-11,0,7); ctx.stroke(); ctx.setLineDash([]);
+  const gl=ctx.createRadialGradient(0,0,0,0,0,r);
+  gl.addColorStop(0,'rgba(201,169,110,.16)'); gl.addColorStop(1,'rgba(201,169,110,0)');
+  ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(0,0,r,0,7); ctx.fill();
+  ctx.fillStyle='#C9A96E'; ctx.font='400 '+Math.round(r*.34)+'px '+SERIF; ctx.fillText('✦',0,-r*.20);
+  ctx.font='800 '+Math.round(r*.26)+'px '+SANS;  ctx.fillText('ТСЛ™',0,r*.14);
+  ctx.fillStyle='rgba(201,169,110,.8)'; ctx.font='600 '+Math.round(r*.125)+'px '+SANS;
+  ctx.fillText('ПОНАМАРЕВА',0,r*.40);
+  ctx.restore();
+}
+function hairline(ctx,W,y,op){
+  const g=ctx.createLinearGradient(90,0,W-90,0);
+  g.addColorStop(0,'rgba(201,169,110,0)'); g.addColorStop(.5,'rgba(201,169,110,'+op+')'); g.addColorStop(1,'rgba(201,169,110,0)');
+  ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(90,y); ctx.lineTo(W-90,y); ctx.stroke();
+}
+
+async function drawCard(fmt){
+  await ensureFonts();
+  const ST = fmt!=='post';
+  const W=1080, H= ST?1920:1350;
+  const cv=document.getElementById('cv'); cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  // фон-градиент
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#132040'); bg.addColorStop(.55,'#0e1c36'); bg.addColorStop(1,'#091321');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  // чертёжная сетка
+  ctx.strokeStyle='rgba(201,169,110,.05)'; ctx.lineWidth=1;
+  for(let x=0;x<=W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<=H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // свечение за формулой
+  const gy = ST? H*.46 : H*.50;
+  const glow=ctx.createRadialGradient(W/2,gy,0,W/2,gy,W*.75);
+  glow.addColorStop(0,'rgba(201,169,110,.20)'); glow.addColorStop(1,'rgba(201,169,110,0)');
+  ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+  // двойная рамка + уголки
+  ctx.strokeStyle='rgba(201,169,110,.55)'; ctx.lineWidth=2; ctx.strokeRect(48,48,W-96,H-96);
+  ctx.strokeStyle='rgba(201,169,110,.22)'; ctx.lineWidth=1; ctx.strokeRect(62,62,W-124,H-124);
+  const cl=54;
+  function co(x,y,dx,dy){ctx.strokeStyle='#C9A96E';ctx.lineWidth=4;ctx.lineCap='square';
+    ctx.beginPath();ctx.moveTo(x,y+dy*cl);ctx.lineTo(x,y);ctx.lineTo(x+dx*cl,y);ctx.stroke();}
+  co(48,48,1,1);co(W-48,48,-1,1);co(48,H-48,1,-1);co(W-48,H-48,-1,-1);
   ctx.textAlign='center';
-  function draw(){
-    // логотип крупнее
-    try{ ctx.drawImage(logoImg, W/2-85, 145, 170, 170); }catch(e){}
-    ctx.fillStyle='#C9A96E'; ctx.font='800 30px Raleway,Arial,sans-serif'; ctx.letterSpacing='8px';
-    ctx.fillText('ТСЛ™', W/2, 370); ctx.letterSpacing='0px';
-    ctx.fillStyle='rgba(201,169,110,.7)'; ctx.font='600 18px Raleway,Arial,sans-serif'; ctx.letterSpacing='3px';
-    ctx.fillText('ТЕОРИЯ СИСТЕМНОЙ ЛЕГИТИМНОСТИ', W/2, 400); ctx.letterSpacing='0px';
-    // заголовок
-    ctx.fillStyle='#D7BD93'; ctx.font='300 italic 64px Georgia,serif';
-    ctx.fillText('Код', W/2, 470);
-    ctx.fillStyle='#F5F2ED'; ctx.font='600 60px Georgia,serif';
-    ctx.fillText('личности', W/2, 545);
-    ctx.fillStyle='rgba(245,242,237,.55)'; ctx.font='300 26px Raleway,Arial,sans-serif';
-    ctx.fillText('Уникальный Паттерн Человека', W/2, 595);
-    // формула-рамка
-    ctx.fillStyle='rgba(201,169,110,.08)'; ctx.fillRect(90,720,W-180,520);
-    ctx.strokeStyle='rgba(201,169,110,.4)'; ctx.lineWidth=1.5; ctx.strokeRect(90,720,W-180,520);
-    ctx.fillStyle='rgba(201,169,110,.7)'; ctx.font='700 22px Raleway,Arial,sans-serif'; ctx.letterSpacing='3px';
-    ctx.fillText('ФОРМУЛА УНИКАЛЬНОГО ПАТТЕРНА', W/2, 790); ctx.letterSpacing='0px';
-    // строки формулы
-    const verb = D.gender==='m' ? 'Я пришёл' : 'Я пришла';
-    ctx.fillStyle='rgba(245,242,237,.78)'; fitFont(ctx,verb,'300 italic',40,24,W-280);
-    ctx.fillText(verb, W/2, 880);
-    ctx.fillStyle='#e8d4a8'; fitFont(ctx,D.q1,'700 italic',46,24,W-260);
-    ctx.fillText(D.q1, W/2, 950);
-    ctx.fillStyle='rgba(245,242,237,.78)'; fitFont(ctx,D.q2,'400 italic',38,22,W-260);
-    ctx.fillText(D.q2+',', W/2, 1018);
-    ctx.fillStyle='rgba(245,242,237,.78)'; ctx.font='300 italic 36px Georgia,serif';
-    ctx.fillText('чтобы', W/2, 1085);
-    ctx.fillStyle='#e8d4a8'; fitFont(ctx,D.q3,'700 italic',42,22,W-260);
-    ctx.fillText(D.q3, W/2, 1155);
-    // призыв
-    ctx.fillStyle='rgba(201,169,110,.85)'; ctx.font='300 italic 34px Georgia,serif';
-    ctx.fillText('А какая формула у вас?', W/2, 1400);
-    ctx.fillStyle='rgba(245,242,237,.5)'; ctx.font='600 24px Raleway,Arial,sans-serif'; ctx.letterSpacing='2px';
-    ctx.fillText('КОД ЛИЧНОСТИ · ТСЛ™', W/2, 1460); ctx.letterSpacing='0px';
-    // низ
-    ctx.fillStyle='rgba(245,242,237,.4)'; ctx.font='500 22px Raleway,Arial,sans-serif'; ctx.letterSpacing='2px';
-    ctx.fillText('architecture-legacy.ru', W/2, H-150); ctx.letterSpacing='0px';
-    // выгрузка
-    const a=document.createElement('a'); a.download='Код_личности.png'; a.href=cv.toDataURL('image/png'); a.click();
-  }
-  const logoImg=new Image();
-  logoImg.onload=draw;
-  logoImg.onerror=draw;
-  logoImg.src=LOGO_URI;
-};
+
+  // ── шапка бренда ──
+  const logoSize = ST?140:104;
+  let y = ST?128:104;
+  try{ ctx.drawImage(logoCardImg, W/2-logoSize/2, y, logoSize, logoSize); }catch(e){}
+  y += logoSize + (ST?52:42);
+  ctx.fillStyle='#C9A96E'; ctx.font='800 30px '+SANS; ctx.letterSpacing='8px';
+  ctx.fillText('ТСЛ™', W/2, y); ctx.letterSpacing='0px';
+  y += ST?30:26;
+  ctx.fillStyle='rgba(201,169,110,.6)'; ctx.font='600 17px '+SANS; ctx.letterSpacing='3px';
+  ctx.fillText('ТЕОРИЯ СИСТЕМНОЙ ЛЕГИТИМНОСТИ', W/2, y); ctx.letterSpacing='0px';
+  y += ST?44:34;
+  // бейдж-пилюля
+  const bw=440, bh=50;
+  ctx.fillStyle='rgba(201,169,110,.10)'; ctx.strokeStyle='rgba(201,169,110,.5)'; ctx.lineWidth=1.5;
+  rr(ctx,W/2-bw/2,y,bw,bh,25); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='rgba(201,169,110,.92)'; ctx.font='700 17px '+SANS; ctx.letterSpacing='4px';
+  ctx.fillText('КОД ЛИЧНОСТИ · ЭКСПРЕСС', W/2, y+32); ctx.letterSpacing='0px';
+  y += bh + (ST?78:58);
+
+  // ── заголовок от первого лица ──
+  ctx.fillStyle='#D7BD93'; ctx.shadowColor='rgba(201,169,110,.45)'; ctx.shadowBlur=26;
+  ctx.font='italic 300 '+(ST?82:68)+'px '+SERIF;
+  ctx.fillText('Моя формула', W/2, y); ctx.shadowBlur=0;
+  y += ST?40:32;
+  ctx.fillStyle='rgba(245,242,237,.45)'; ctx.font='400 22px '+SANS;
+  ctx.fillText('Уникальный Паттерн Человека', W/2, y);
+  y += ST?46:34;
+  hairline(ctx,W,y,.4);
+  ctx.fillStyle='#C9A96E'; ctx.font='400 26px '+SERIF;
+  ctx.fillText('✦', W/2, y+9);
+  y += ST?86:62;
+
+  // ── формула (двухпроходная: замер высоты → вертикальное центрирование) ──
+  const verb = D.gender==='m' ? 'Я пришёл' : 'Я пришла';
+  const sealR0 = ST?104:80;
+  const sealTop = (H-(ST?470:348)) - sealR0;          // верх печати
+  const m1=fitWrap(ctx,D.q1,'italic 600',ST?64:54,30,W-240,2);
+  const m2=fitWrap(ctx,D.q2+',','italic 400',ST?48:42,26,W-240,2);
+  const m3=fitWrap(ctx,D.q3,'italic 600',ST?58:48,28,W-240,2);
+  const fh = (ST?78:62) + m1.lines.length*m1.px*1.16 + (ST?12:4)
+           + m2.lines.length*m2.px*1.18 + (ST?14:6) + (ST?72:58)
+           + m3.lines.length*m3.px*1.16 + (ST?26:14);
+  const zone = sealTop - 60 - y;
+  y += Math.max(10, (zone - fh)/2);
+  ctx.fillStyle='rgba(245,242,237,.72)'; ctx.font='italic 300 '+(ST?46:40)+'px '+SERIF;
+  ctx.fillText(verb, W/2, y);
+  y += ST?78:62;
+  // q1 — дар
+  let f1=fitWrap(ctx,D.q1,'italic 600',ST?64:54,30,W-240,2);
+  ctx.fillStyle='#e8d4a8'; ctx.shadowColor='rgba(232,212,168,.55)'; ctx.shadowBlur=22;
+  f1.lines.forEach(ln=>{ ctx.fillText(ln, W/2, y); y+=f1.px*1.16; });
+  ctx.shadowBlur=0; y += ST?12:4;
+  // q2 — инструмент
+  let f2=fitWrap(ctx,D.q2+',','italic 400',ST?48:42,26,W-240,2);
+  ctx.fillStyle='rgba(245,242,237,.82)';
+  f2.lines.forEach(ln=>{ ctx.fillText(ln, W/2, y); y+=f2.px*1.18; });
+  y += ST?14:6;
+  ctx.fillStyle='rgba(245,242,237,.6)'; ctx.font='italic 300 '+(ST?40:34)+'px '+SERIF;
+  ctx.fillText('чтобы', W/2, y);
+  y += ST?72:58;
+  // q3 — вклад
+  let f3=fitWrap(ctx,D.q3,'italic 600',ST?58:48,28,W-240,2);
+  ctx.fillStyle='#e8d4a8'; ctx.shadowColor='rgba(232,212,168,.55)'; ctx.shadowBlur=22;
+  f3.lines.forEach(ln=>{ ctx.fillText(ln, W/2, y); y+=f3.px*1.16; });
+  ctx.shadowBlur=0;
+  y += ST?26:14;
+  hairline(ctx,W,y,.3);
+
+  // ── печать-заверение ──
+  const sealR = sealR0;
+  const sealY = Math.max(y+sealR+(ST?64:46), sealTop+sealR);
+  drawSeal(ctx,W/2,sealY,sealR);
+
+  // ── вирусный вопрос ──
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(201,169,110,.9)'; ctx.font='italic 400 '+(ST?38:32)+'px '+SERIF;
+  ctx.fillText('А какая формула у вас?', W/2, sealY+sealR+(ST?72:54));
+
+  // ── пилюля-ссылка ──
+  const uw=560, uh=54, uy=H-(ST?186:150);
+  ctx.fillStyle='rgba(13,24,41,.6)'; ctx.strokeStyle='rgba(201,169,110,.55)'; ctx.lineWidth=1.5;
+  rr(ctx,W/2-uw/2,uy,uw,uh,27); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#D7BD93'; ctx.font='600 25px '+SANS; ctx.letterSpacing='2px';
+  ctx.fillText('architecture-legacy.ru/code', W/2, uy+35); ctx.letterSpacing='0px';
+  ctx.fillStyle='rgba(245,242,237,.35)'; ctx.font='500 17px '+SANS; ctx.letterSpacing='3px';
+  ctx.fillText('УЗНАЙТЕ СВОЮ ЗА ОДНУ МИНУТУ', W/2, uy+uh+34); ctx.letterSpacing='0px';
+}
+
+let logoCardImg = new Image(); logoCardImg.src = LOGO_URI;
+
+async function exportCard(fmt){
+  await new Promise(res=>{ if(logoCardImg.complete) res();
+    else { logoCardImg.onload=res; logoCardImg.onerror=res; } });
+  await drawCard(fmt);
+  const cv=document.getElementById('cv');
+  const fname='Код_личности_'+(fmt==='post'?'пост':'сторис')+'.png';
+  // нативный шеринг на телефоне → сразу в Instagram/Telegram/VK
+  try{
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+    const file=new File([blob],fname,{type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'Код личности · ТСЛ™'});
+      return;
+    }
+  }catch(e){ if(e && e.name==='AbortError') return; }
+  const a=document.createElement('a'); a.download=fname;
+  a.href=cv.toDataURL('image/png'); a.click();
+}
+window.shareCard=function(fmt){ exportCard(fmt||'stories'); };
 })();
 </script>
 </body>
