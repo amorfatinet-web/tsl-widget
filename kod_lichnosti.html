@@ -1415,7 +1415,7 @@ h1 em{font-style:italic;color:#C9A96E;font-weight:400}
 .auth .ar{font-size:9px;color:rgba(245,242,237,.5);font-style:italic;letter-spacing:1px}
 .foot{text-align:center;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,242,237,.3);margin-top:16px}
 @page{size:A4;margin:0}
-@media print{.toolbar{display:none}.page-wrap{padding:0}.cert{margin:0;box-shadow:none}}
+@media print{.toolbar{display:none}.page-wrap{padding:0}.cert{margin:0;box-shadow:none;page-break-inside:avoid;break-inside:avoid}}
 </style></head><body>
 <div class="toolbar">
   <button class="tb-btn tb-print" onclick="window.print()">Печать сертификата</button>
@@ -1461,7 +1461,7 @@ h1 em{font-style:italic;color:#C9A96E;font-weight:400}
   </div>
 </div>
 </div>
-</body></html>`;
+<script>function fitA4(){var c=document.querySelector('.cert');if(!c)return;document.body.style.zoom='';var k=Math.min(1,1104/c.offsetHeight);if(k<1)document.body.style.zoom=k;}window.addEventListener('beforeprint',fitA4);window.addEventListener('afterprint',function(){document.body.style.zoom='';});window.matchMedia&&window.matchMedia('print').addEventListener&&window.matchMedia('print').addEventListener('change',function(m){if(m.matches)fitA4();else document.body.style.zoom='';});<\/script></body></html>`;
   const blob = new Blob([html],{type:'text/html;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const win = window.open(url,'_blank');
@@ -1595,6 +1595,26 @@ window.downloadStories = function() {
       ctx.fillText(it[1]+'/10',x,1260); ctx.shadowBlur=0;
       ctx.font='400 16px Raleway,Arial,sans-serif'; ctx.fillStyle='rgba(245,242,237,0.38)'; ctx.fillText(it[3],x,1282);
     });
+
+    // Гербовая печать + серийный номер — заверение карточки
+    (function(){
+      function seal(cx,cy,r){ ctx.save(); ctx.translate(cx,cy); ctx.rotate(-0.14); ctx.textAlign='center';
+        ctx.strokeStyle='rgba(201,169,110,.9)'; ctx.lineWidth=3;
+        ctx.beginPath(); ctx.arc(0,0,r,0,7); ctx.stroke();
+        ctx.setLineDash([6,7]); ctx.lineWidth=1.6; ctx.strokeStyle='rgba(201,169,110,.55)';
+        ctx.beginPath(); ctx.arc(0,0,r-11,0,7); ctx.stroke(); ctx.setLineDash([]);
+        var gl2=ctx.createRadialGradient(0,0,0,0,0,r);
+        gl2.addColorStop(0,'rgba(201,169,110,.16)'); gl2.addColorStop(1,'rgba(201,169,110,0)');
+        ctx.fillStyle=gl2; ctx.beginPath(); ctx.arc(0,0,r,0,7); ctx.fill();
+        ctx.fillStyle='#C9A96E'; ctx.font='400 36px Georgia,serif'; ctx.fillText('✦',0,-r*.20);
+        ctx.font='800 27px Raleway,Arial,sans-serif'; ctx.fillText('ТСЛ™',0,r*.14);
+        ctx.fillStyle='rgba(201,169,110,.8)'; ctx.font='600 13px Raleway,Arial,sans-serif'; ctx.fillText('ПОНАМАРЕВА',0,r*.40);
+        ctx.restore(); }
+      seal(W/2,1462,106);
+      var num=((document.getElementById('pNum')||{}).textContent)||('№ УПЧ-'+new Date().getFullYear()+'-'+String(Date.now()).slice(-4));
+      ctx.font='500 21px Raleway,Arial,sans-serif'; ctx.fillStyle='rgba(245,242,237,.42)'; ctx.letterSpacing='2px';
+      ctx.fillText(num, W/2, 1614); ctx.letterSpacing='0px';
+    })();
 
     // Date + status
     div(H-240,.3);
