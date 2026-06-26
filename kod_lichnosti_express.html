@@ -50,6 +50,31 @@ textarea{min-height:80px;line-height:1.5}
 .back:hover{color:var(--dim)}
 /* формула-результат */
 .fbox{background:linear-gradient(180deg,rgba(201,169,110,.1),rgba(201,169,110,.03));border:1.5px solid var(--bord);padding:30px 22px;margin:8px 0 6px;text-align:center;border-radius:3px;position:relative}
+.fbox-corner{position:absolute;width:16px;height:16px;border-color:rgba(201,169,110,.55)}
+.fbox-corner.tl{top:9px;left:9px;border-top:1.5px solid;border-left:1.5px solid}
+.fbox-corner.tr{top:9px;right:9px;border-top:1.5px solid;border-right:1.5px solid}
+.fbox-corner.bl{bottom:9px;left:9px;border-bottom:1.5px solid;border-left:1.5px solid}
+.fbox-corner.br{bottom:9px;right:9px;border-bottom:1.5px solid;border-right:1.5px solid}
+
+.rhythm-box{margin-top:30px;padding:30px 22px;border:1px solid rgba(201,169,110,.45);background:radial-gradient(circle at 50% 0%,rgba(201,169,110,.12),rgba(201,169,110,.03) 70%);text-align:center;position:relative}
+.rhythm-corner{position:absolute;width:14px;height:14px;border-color:rgba(201,169,110,.5)}
+.rhythm-corner.tl{top:9px;left:9px;border-top:1.5px solid;border-left:1.5px solid}
+.rhythm-corner.tr{top:9px;right:9px;border-top:1.5px solid;border-right:1.5px solid}
+.rhythm-eyebrow{font-size:13px;font-style:italic;font-family:'Cormorant Garamond',serif;color:rgba(245,242,237,.5);margin-bottom:14px;line-height:1.5}
+.rhythm-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,6vw,30px);font-weight:300;color:var(--gold2);line-height:1.18;margin-bottom:14px}
+.rhythm-title em{font-style:italic;color:var(--gold)}
+.rhythm-text{font-size:13px;color:rgba(245,242,237,.6);line-height:1.75;max-width:340px;margin:0 auto 24px}
+
+.divider-sm{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.22),transparent);margin:30px 0}
+
+.share-row{display:flex;flex-direction:column;gap:11px;align-items:center;margin-top:14px}
+.share-pair{display:flex;gap:10px;width:100%;max-width:380px}
+.share-pair .btn-sec{flex:1;margin:0;font-size:12px;padding:14px 8px}
+
+.deep-row{text-align:center;margin-top:6px}
+.deep-link{font-size:12px;color:rgba(201,169,110,.6);text-decoration:none;line-height:1.7;border-bottom:1px solid rgba(201,169,110,.25);padding-bottom:3px;display:inline-block;transition:all .2s}
+.deep-link:hover{color:var(--gold);border-color:var(--gold)}
+
 .fbox-lbl{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(201,169,110,.7);margin-bottom:18px}
 .formula{font-family:'Cormorant Garamond',serif;font-size:clamp(21px,5vw,27px);font-weight:500;color:var(--cream);line-height:1.7}
 .formula .fg{color:var(--gold3);font-style:italic;font-weight:600}
@@ -153,17 +178,37 @@ body.cover .prog{display:none}
 
   <!-- ЭКРАН 4: результат -->
   <div class="scr" id="s4">
-    <div class="eyebrow">Ваша формула</div>
+    <div class="eyebrow">Ваша формула готова</div>
     <div class="fbox">
+      <div class="fbox-corner tl"></div><div class="fbox-corner tr"></div>
+      <div class="fbox-corner bl"></div><div class="fbox-corner br"></div>
       <div class="fbox-lbl">Формула уникального паттерна</div>
       <div class="formula" id="fout"></div>
     </div>
+
+    <div class="rhythm-box">
+      <div class="rhythm-corner tl"></div><div class="rhythm-corner tr"></div>
+      <div class="rhythm-eyebrow">Формула найдена. Дальше — действие</div>
+      <div class="rhythm-title">Решите ею<br><em>сегодняшнюю задачу</em></div>
+      <div class="rhythm-text">Каждое утро — один шаг от формулы к конкретному решению: что делать с письмом, разговором, выбором. Опора под рукой, вместо теории.</div>
+      <button class="btn" onclick="goDaily()">Решить сегодняшнюю →</button>
+    </div>
+
+    <div class="divider-sm"></div>
+
     <div class="share-row">
-      <div class="cta-lbl">Что дальше</div>
-      <button class="btn" onclick="goDeep()">Получить полный Код с сертификатом →</button>
-      <button class="btn btn-sec" onclick="shareCard('stories')">Поделиться в сторис · 9:16</button>
-      <button class="btn btn-sec" onclick="shareCard('post')">Карточка для поста · 4:5</button>
+      <div class="cta-lbl">Поделиться формулой</div>
+      <div class="share-pair">
+        <button class="btn-sec" onclick="shareCard('stories')">Сторис · 9:16</button>
+        <button class="btn-sec" onclick="shareCard('post')">Пост · 4:5</button>
+      </div>
       <div class="viral">Отметьте <b>@TSL_method</b> — лучшие формулы попадают в подборку сообщества</div>
+    </div>
+
+    <div class="divider-sm"></div>
+
+    <div class="deep-row">
+      <a class="deep-link" href="#" onclick="goDeep();return false">Получить полный Код с сертификатом и печатью автора →</a>
       <a class="btn-ghost" href="https://t.me/TSL_method" target="_top">Войти в сообщество ТСЛ™ →</a>
     </div>
   </div>
@@ -222,6 +267,14 @@ window.reveal = function(){
   const verb = D.gender==='m' ? 'Я пришёл' : 'Я пришла';
   const f=verb+' <span class="fg">'+esc(D.q1)+'</span> '+esc(D.q2)+',<br>чтобы <span class="fg">'+esc(D.q3)+'</span>';
   document.getElementById('fout').innerHTML=f;
+  // сохраняем формулу в общее хранилище — её читает ежедневный ритм
+  try{
+    localStorage.setItem('tsl_uphc_formula', JSON.stringify({
+      dar: D.q1, instrument: D.q2, vklad: D.q3, gender: D.gender,
+      formula: verb+' '+D.q1+' '+D.q2+', чтобы '+D.q3,
+      source: 'express', verified: false, savedAt: new Date().toISOString()
+    }));
+  }catch(e){}
   go(4);
 };
 function esc(s){ return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -229,6 +282,11 @@ function esc(s){ return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 window.goDeep = function(){
   // переход на полный Код личности
   window.top.location.href='https://architecture-legacy.ru/code';
+};
+
+window.goDaily = function(){
+  // переход на ежедневный ритм — формула уже сохранена в reveal()
+  window.top.location.href='https://architecture-legacy.ru/den';
 };
 
 // === Карточки для соцсетей · v2 (сторис 9:16 + пост 4:5, печать, фирменные шрифты, нативный шеринг) ===
