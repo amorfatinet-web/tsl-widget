@@ -937,6 +937,7 @@ canvas { display:none }
           </div>
           <button class="btn btn-gold" onclick="downloadPDF()">Скачать PDF-паспорт</button>
   <button class="btn" id="btnSaveDiaryUPCH" onclick="saveToDiary()" style="margin-top:8px;background:rgba(201,169,110,.12);border:1px solid rgba(201,169,110,.4);color:#C9A96E;font-family:'Raleway',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;padding:14px">Сохранить в Дневник Архитектора</button>
+  <a href="https://architecture-legacy.ru/formula_day" target="_top" id="btnGoDaily" class="btn btn-gold" style="display:none;text-decoration:none;margin-top:8px">Жить формулой каждый день →</a>
   <button class="btn btn-navy" onclick="downloadStories()" style="margin-top:8px">Скачать Stories-карточку</button>
   <button class="btn btn-ghost" onclick="saveDraft()" style="margin-top:8px">Сохранить черновик (JSON)</button>
   <button class="btn btn-ghost" onclick="resetAll()" style="margin-top:6px">Начать заново</button>
@@ -1320,6 +1321,19 @@ window.saveToDiary = function(){
     selectedWords: words,
     dominant: 'P'
   };
+  // верифицированная формула — перезаписывает гипотезу экспресса в общем хранилище ритма
+  try{
+    const serialEl = document.getElementById('pNum');
+    const serial = serialEl ? serialEl.textContent.replace('№ ','') : '';
+    const bcSum = (Number(D.sN)||0)+(Number(D.sC)||0)+(Number(D.sP)||0);
+    localStorage.setItem('tsl_uphc_formula', JSON.stringify({
+      dar: D.dar||'', instrument: D.action||'', vklad: D.vklad||'',
+      gender: D.gender||'f', formula: formula,
+      source: 'full', verified: true, bodyCheckSum: bcSum,
+      serial: serial, ownerName: D.ownerName||'',
+      savedAt: new Date().toISOString()
+    }));
+  }catch(e){}
   let diary = [];
   try { diary = JSON.parse(localStorage.getItem('tsl_diary') || '[]'); } catch(e){}
   diary.unshift(entry);
@@ -1328,6 +1342,8 @@ window.saveToDiary = function(){
     localStorage.setItem('tsl_diary', JSON.stringify(diary));
     const btn = document.getElementById('btnSaveDiaryUPCH');
     if(btn){ btn.textContent = '✦ Сохранено в Дневник'; btn.style.opacity='0.6'; setTimeout(()=>{ btn.textContent='Сохранить в Дневник Архитектора'; btn.style.opacity='1'; }, 2500); }
+    const goDailyBtn = document.getElementById('btnGoDaily');
+    if(goDailyBtn){ goDailyBtn.style.display='block'; }
     if(navigator.vibrate) navigator.vibrate([10,50,10]);
   } catch(e){ alert('Не удалось сохранить'); }
 };
