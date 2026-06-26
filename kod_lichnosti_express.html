@@ -56,6 +56,25 @@ textarea{min-height:80px;line-height:1.5}
 .fbox-corner.bl{bottom:9px;left:9px;border-bottom:1.5px solid;border-left:1.5px solid}
 .fbox-corner.br{bottom:9px;right:9px;border-bottom:1.5px solid;border-right:1.5px solid}
 
+/* ===== ПРОДАЮЩИЙ БЛОК — главный приоритет экрана результата ===== */
+.sell-box{margin-top:26px;padding:32px 24px;border:1.5px solid var(--gold);background:linear-gradient(165deg,rgba(201,169,110,.14),rgba(201,169,110,.04) 60%);text-align:center;position:relative;box-shadow:0 0 40px rgba(201,169,110,.12)}
+.sell-corner{position:absolute;width:16px;height:16px;border-color:var(--gold)}
+.sell-corner.tl{top:10px;left:10px;border-top:2px solid;border-left:2px solid}
+.sell-corner.tr{top:10px;right:10px;border-top:2px solid;border-right:2px solid}
+.sell-corner.bl{bottom:10px;left:10px;border-bottom:2px solid;border-left:2px solid}
+.sell-corner.br{bottom:10px;right:10px;border-bottom:2px solid;border-right:2px solid}
+.sell-eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.sell-title{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,6.5vw,32px);font-weight:300;color:var(--gold2);line-height:1.18;margin-bottom:14px}
+.sell-title em{font-style:italic;color:var(--gold)}
+.sell-text{font-size:13.5px;color:rgba(245,242,237,.7);line-height:1.8;max-width:380px;margin:0 auto 22px}
+.sell-price-row{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-bottom:20px}
+.sell-price-old{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--dim2);text-decoration:line-through}
+.sell-price{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:500;color:var(--gold2)}
+.sell-price-note{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,169,110,.7)}
+.btn-sell{display:block;width:100%;max-width:380px;margin:0 auto;background:var(--gold);color:var(--navy);font-family:'Raleway',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;padding:20px;text-transform:uppercase;border:2px solid var(--gold);border-radius:3px;cursor:pointer;transition:all .3s}
+.btn-sell:hover{background:transparent;color:var(--gold)}
+.sell-trust{font-size:11px;color:var(--dim2);margin-top:14px;letter-spacing:.4px}
+
 .rhythm-box{margin-top:30px;padding:30px 22px;border:1px solid rgba(201,169,110,.45);background:radial-gradient(circle at 50% 0%,rgba(201,169,110,.12),rgba(201,169,110,.03) 70%);text-align:center;position:relative}
 .rhythm-corner{position:absolute;width:14px;height:14px;border-color:rgba(201,169,110,.5)}
 .rhythm-corner.tl{top:9px;left:9px;border-top:1.5px solid;border-left:1.5px solid}
@@ -64,6 +83,8 @@ textarea{min-height:80px;line-height:1.5}
 .rhythm-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,6vw,30px);font-weight:300;color:var(--gold2);line-height:1.18;margin-bottom:14px}
 .rhythm-title em{font-style:italic;color:var(--gold)}
 .rhythm-text{font-size:13px;color:rgba(245,242,237,.6);line-height:1.75;max-width:340px;margin:0 auto 24px}
+.btn-sec-rhythm{display:block;width:100%;max-width:380px;margin:0 auto;background:transparent;color:var(--gold2);font-family:'Raleway',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;padding:16px;text-transform:uppercase;border:1px solid var(--bord);border-radius:3px;cursor:pointer;transition:all .3s}
+.btn-sec-rhythm:hover{border-color:var(--gold);color:var(--gold)}
 
 .divider-sm{height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.22),transparent);margin:30px 0}
 
@@ -187,12 +208,29 @@ body.cover .prog{display:none}
       <div class="formula" id="fout"></div>
     </div>
 
+    <div class="sell-box">
+      <div class="sell-corner tl"></div><div class="sell-corner tr"></div>
+      <div class="sell-corner bl"></div><div class="sell-corner br"></div>
+      <div class="sell-eyebrow">Это гипотеза. Закрепите её печатью</div>
+      <div class="sell-title">Подтвердите формулу<br><em>именным сертификатом</em></div>
+      <div class="sell-text">Body Check и облако смыслов проверяют формулу телесно — прежде чем поставить печать автора метода и серийный номер. Дальше каждая ваша карточка ритма несёт настоящую печать вместо пунктирного контура.</div>
+      <div class="sell-price-row">
+        <span class="sell-price-old">1 290 ₽</span>
+        <span class="sell-price">690 ₽</span>
+        <span class="sell-price-note">цена старта</span>
+      </div>
+      <button class="btn btn-sell" onclick="goDeep()">Подтвердить формулу · 690 ₽</button>
+      <div class="sell-trust">Оплата через Продамус · доступ открывается сразу</div>
+    </div>
+
+    <div class="divider-sm"></div>
+
     <div class="rhythm-box">
       <div class="rhythm-corner tl"></div><div class="rhythm-corner tr"></div>
-      <div class="rhythm-eyebrow">Формула найдена. Дальше — действие</div>
+      <div class="rhythm-eyebrow">Хотите начать прямо сейчас — бесплатно</div>
       <div class="rhythm-title">Решите ею<br><em>сегодняшнюю задачу</em></div>
       <div class="rhythm-text">Каждое утро — один шаг от формулы к конкретному решению: что делать с письмом, разговором, выбором. Опора под рукой, вместо теории.</div>
-      <button class="btn" onclick="goDaily()">Решить сегодняшнюю →</button>
+      <button class="btn btn-sec-rhythm" onclick="goDaily()">Решить сегодняшнюю →</button>
     </div>
 
     <div class="divider-sm"></div>
@@ -209,7 +247,6 @@ body.cover .prog{display:none}
     <div class="divider-sm"></div>
 
     <div class="deep-row">
-      <a class="deep-link" href="#" onclick="goDeep();return false">Получить полный Код с сертификатом и печатью автора →</a>
       <a class="btn-ghost" href="https://t.me/TSL_method" target="_top">Войти в сообщество ТСЛ™ →</a>
     </div>
   </div>
