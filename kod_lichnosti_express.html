@@ -111,12 +111,13 @@ canvas{display:none}
 .cover-sub{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(245,242,237,.4);text-align:center;margin-bottom:30px}
 body.cover .head{display:none}
 body.cover .prog{display:none}
-.share-ovl{position:fixed;inset:0;background:rgba(7,14,26,.94);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:99;padding:20px}
+.share-ovl{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:#050c18;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:24px;overflow-y:auto}
 .share-ovl.on{display:flex}
-.share-ovl img{max-width:min(78vw,320px);max-height:58vh;border:1px solid rgba(201,169,110,.5);box-shadow:0 24px 70px rgba(0,0,0,.65)}
-.share-hint{font-size:13px;color:rgba(245,242,237,.65);margin:16px 0 12px;text-align:center;line-height:1.6;max-width:300px}
-.share-dl{background:#C9A96E;color:#0d1829;font-family:'Raleway',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;padding:14px 34px;border:2px solid #C9A96E;cursor:pointer;text-transform:uppercase}
-.share-x{margin-top:12px;background:transparent;border:none;color:rgba(245,242,237,.5);font-family:'Raleway',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer;text-transform:uppercase}
+.share-ovl-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:#D7BD93;margin-bottom:16px;text-align:center}
+.share-ovl img{width:min(82vw,340px);max-height:62vh;height:auto;border:1px solid rgba(201,169,110,.6);box-shadow:0 24px 80px rgba(0,0,0,.8);display:block;background:#0d1829}
+.share-hint{font-size:14px;color:rgba(245,242,237,.75);margin:18px 0 14px;text-align:center;line-height:1.7;max-width:320px}
+.share-dl{background:#C9A96E;color:#0d1829;font-family:'Raleway',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;padding:16px 40px;border:2px solid #C9A96E;cursor:pointer;text-transform:uppercase}
+.share-x{margin-top:14px;background:transparent;border:none;color:rgba(245,242,237,.7);font-family:'Raleway',sans-serif;font-size:13px;letter-spacing:2px;cursor:pointer;text-transform:uppercase;padding:8px}
 </style>
 </head>
 <body class="cover">
@@ -216,6 +217,7 @@ body.cover .prog{display:none}
   <div class="foot">© Марина Понамарева · ТСЛ™ · architecture-legacy.ru</div>
 </div>
 <div class="share-ovl" id="shareOvl">
+  <div class="share-ovl-title">Ваша карточка готова ✦</div>
   <img id="shareImg" alt="Карточка Код личности">
   <div class="share-hint">Удерживайте картинку и выберите «Сохранить изображение»</div>
   <button class="share-dl" id="shareDl">Скачать PNG</button>
@@ -286,7 +288,7 @@ window.goDeep = function(){
 
 window.goDaily = function(){
   // переход на ежедневный ритм — формула уже сохранена в reveal()
-  window.top.location.href='https://architecture-legacy.ru/den';
+  window.top.location.href='https://architecture-legacy.ru/formula_day';
 };
 
 // === Карточки для соцсетей · v2 (сторис 9:16 + пост 4:5, печать, фирменные шрифты, нативный шеринг) ===
@@ -467,14 +469,18 @@ async function exportCard(fmt){
   const cv=document.getElementById('cv');
   const fname='Код_личности_'+(fmt==='post'?'пост':'сторис')+'.png';
   // 1) нативное «Поделиться» — карточка уходит файлом прямо в сторис
+  let shared=false;
   try{
     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
     const file=new File([blob],fname,{type:'image/png'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
       await navigator.share({files:[file],title:'Код личности · ТСЛ™'});
-      return;
+      shared=true;
     }
-  }catch(e){ if(e && e.name==='AbortError') return; }
+  }catch(e){
+    // отмена системного окна «Поделиться» — не сбой, просто переходим к предпросмотру
+  }
+  if(shared) return;
   // 2) предпросмотр: картинка сохраняется удержанием или кнопкой
   const url=cv.toDataURL('image/png');
   document.getElementById('shareImg').src=url;
